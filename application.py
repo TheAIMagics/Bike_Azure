@@ -25,9 +25,9 @@ MODEL_DIR = os.path.join(ROOT_DIR, SAVED_MODELS_DIR_NAME)
 SHARING_DATA_KEY = "sharing_data"
 MEDIAN_SHARING_VALUE_KEY = "median_share_value"
 
-app=Flask(__name__)
+application=Flask(__name__)
 
-@app.route("/dashboard",methods=['GET','POST'])
+@application.route("/dashboard",methods=['GET','POST'])
 def dashboard():
     try:
         log_count = 0
@@ -42,7 +42,7 @@ def dashboard():
         logging.info(sharing.error_message)
     logging.info("Testing logger module")
 
-@app.route("/",methods=['GET','POST'])
+@application.route("/",methods=['GET','POST'])
 def index():
     try:
         return render_template('index.html')
@@ -50,7 +50,7 @@ def index():
         sharing = SharingException(e,sys)
         logging.info(sharing.error_message)
    
-@app.route('/predict', methods=['GET', 'POST'])
+@application.route('/predict', methods=['GET', 'POST'])
 def predict():
     try:
        
@@ -88,7 +88,7 @@ def predict():
     except Exception as e:
             raise SharingException(e, sys) from e
 
-@app.route('/batch_predict')
+@application.route('/batch_predict')
 def batch_predict():
     try:
         batch_data_path = os.path.join(ROOT_DIR,BATCH_DATA)
@@ -100,7 +100,7 @@ def batch_predict():
     except Exception as e:
             raise SharingException(e, sys) from e
 
-@app.route('/view_experiment_hist', methods=['GET', 'POST'])
+@application.route('/view_experiment_hist', methods=['GET', 'POST'])
 def view_experiment_history():
     pipeline = Pipeline(config=Configuartion(current_time_stamp=get_current_time_stamp()))
     experiment_df = pipeline.get_experiments_status()
@@ -109,8 +109,8 @@ def view_experiment_history():
     }
     return render_template('experiment_history.html', context=context)
 
-@app.route(f'/logs', defaults={'req_path': f'{LOG_FOLDER_NAME}'})
-@app.route(f'/{LOG_FOLDER_NAME}/<path:req_path>')
+@application.route(f'/logs', defaults={'req_path': f'{LOG_FOLDER_NAME}'})
+@application.route(f'/{LOG_FOLDER_NAME}/<path:req_path>')
 def render_log_dir(req_path):
     os.makedirs(LOG_FOLDER_NAME, exist_ok=True)
     # Joining the base and the requested path
@@ -136,8 +136,8 @@ def render_log_dir(req_path):
     }
     return render_template('log_files.html', result=result, dashboard=False)
 
-@app.route('/saved_models', defaults={'req_path': 'saved_models'})
-@app.route('/saved_models/<path:req_path>')
+@application.route('/saved_models', defaults={'req_path': 'saved_models'})
+@application.route('/saved_models/<path:req_path>')
 def saved_models_dir(req_path):
     os.makedirs("saved_models", exist_ok=True)
     # Joining the base and the requested path
@@ -161,8 +161,8 @@ def saved_models_dir(req_path):
     }
     return render_template('saved_models_files.html', result=result)
 
-@app.route('/artifact', defaults={'req_path': 'sharing'})
-@app.route('/artifact/<path:req_path>')
+@application.route('/artifact', defaults={'req_path': 'sharing'})
+@application.route('/artifact/<path:req_path>')
 def render_artifact_dir(req_path):
     os.makedirs("sharing", exist_ok=True)
     # Joining the base and the requested path
@@ -194,11 +194,11 @@ def render_artifact_dir(req_path):
     }
     return render_template('files.html', result=result)
 
-@app.route('/reports')
+@application.route('/reports')
 def reports():
     return render_template('reports.html')
 
-@app.route("/update_model_config", methods=['GET', 'POST'])
+@application.route("/update_model_config", methods=['GET', 'POST'])
 def update_model_config():
     try:
         if request.method == 'POST':
@@ -215,7 +215,7 @@ def update_model_config():
         logging.exception(e)
         return str(e)
 
-@app.route('/train', methods=['GET', 'POST'])
+@application.route('/train', methods=['GET', 'POST'])
 def train():
     pipeline = Pipeline(config=Configuartion(current_time_stamp=get_current_time_stamp()))
     context = {
@@ -223,7 +223,7 @@ def train():
     }
     return render_template('train.html',context=context)
 
-@app.route('/initiate_train', methods=['GET', 'POST'])
+@application.route('/initiate_train', methods=['GET', 'POST'])
 def initiate_train():
     message = ""
     pipeline = Pipeline(config=Configuartion(current_time_stamp=get_current_time_stamp()))
@@ -243,4 +243,4 @@ def initiate_train():
     
 
 if __name__=="__main__":
-    app.run(debug=True, port=8000)
+    application.run(debug=True)
